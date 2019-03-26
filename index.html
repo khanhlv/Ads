@@ -1,8 +1,124 @@
 <html>
 	<head>
 		<title>Affiliate Ads</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<head>
 	<body>
-		Hưỡng dẫn
+		<script>
+			$(document).ready(function(){
+			  function getRandomInt(min, max) {
+				min = Math.ceil(min);
+				max = Math.floor(max);
+				return Math.floor(Math.random() * (max - min + 1)) + min;
+			  }
+
+			  function dataByCompaign(data, compaign) {
+				var dataByCampaign = [];
+				for (var i = 0; i < data.length; i++) {
+				  if (data[0] === compaign) {
+					dataByCampaign.push(data);
+				  }
+				}
+				return dataByCampaign;
+			  }
+
+			  function makeDeepLink(link, campaign, id) {
+				var deepLink = 'https://fast.accesstrade.com.vn/deep_link/' + id + '?url=';
+				deepLink += encodeURIComponent(link);
+				deepLink += '&utm_source='+ campaign + '&utm_medium=website&utm_campaign='+ campaign + '&utm_content='+ campaign;
+				return deepLink;
+			  }
+
+			  var sheetId = '1koipCsaGnGStw5HW8I-cCbEDkStqN9lvQKso6VvBbD4';
+			  var sheetIndex = '1'
+			  var sheetUrl = 'https://spreadsheets.google.com/feeds/cells/' + sheetId + '/' + sheetIndex + '/public/full?alt=json';
+
+
+			  $.getJSON(sheetUrl, function(data){
+				var entry = data.feed.entry;
+				var data = [];
+				var columns = 8;
+				for (var i = columns, lengEntry = entry.length; i < lengEntry; i += columns){
+				  var rows = []; 
+				  for (var j = 0; j < columns; j++) {
+					rows.push(entry[i + j] ? entry[i + j].content.$t : '')
+				  }
+				  data.push(rows);
+				}
+
+					var auto = $('.affilicate-ads').data('auto');
+				var time = $('.affilicate-ads').data('time');
+				
+				/* if (auto) {
+				  intervalItem(data, time ? time : 5000);
+				} else {
+				  displayAds(data);
+				} */
+				displayAds(data);
+			  });
+			  
+			  function displayAds(data, indexItem) {
+
+				$('.affilicate-ads').empty();
+				$('.affilicate-ads').css({
+				  "width": "300px",
+				  "margin": "0px auto",
+				  "padding": "0px",
+				  "position": "relative",
+				  "background": "white"
+				});
+
+
+				$('.affilicate-ads').each(function(e) {
+					var index = getRandomInt(0, data.length-1);
+				  var dataAds = data[indexItem ? indexItem : index];
+				  var that = $(this);
+				  var html = '<a target="_bank" style="text-decoration: none;color: black;" href="' + makeDeepLink(dataAds[1], dataAds[0], dataAds[7]) +'"><img style="border: 0px" src="' + dataAds[2] +'" width="300" height="250"></a>';
+
+				  if (dataAds[6] == '1') {
+					html = '<a target="_bank" style="text-align: center;text-decoration: none;color: black;" href="' + makeDeepLink(dataAds[1], dataAds[0], dataAds[7]) +'">';
+
+					if (dataAds[0] === 'tiki') {
+					  html += '<img src="https://tiki.vn/favicon-32x32.png" height="32" width="32" style="position: absolute;top: 10px;left: 10px;">'
+					  html += '<img src="https://salt.tikicdn.com/media/upload/2019/01/28/30dbd37d95da24ea1ced99561d7837cf.png" height="20" width="47" style="position: absolute;top: 10px;right: 10px;">'
+					}
+
+					html += '<img style="border: 1px dotted #ddd;" src="' + dataAds[2] +'" width="300" height="250">';
+					html += '<p style="font-weight:300;color: blue;font-size:16px;padding: 0px;margin: 0px;">' + dataAds[4] +'</p>'
+					html += '<p style="padding: 0px;margin: 0px;font-size:20px">'
+					if (dataAds[3].split('/').length > 0) {
+					  var price = dataAds[3].split('/');
+					  html += '<span style="color:red;font-weight:bold">' + price[0] + '</span>'
+					  html += '<span style="margin-left:8px;color:#737373;font-weight:300;font-size:14px;text-decoration:line-through">' + price[1] + 'đ</span>'
+					} else {
+					  html += '<span style="color:red;font-weight:bold">' + dataAds[3] + 'đ</span>'
+					}
+					html += '</p>';
+					html += '</a>';
+				  }
+
+				  that.append(html);
+				});
+			  }
+			  
+			  function intervalItem(data, time) {
+				var intervalCount = 0;
+				setInterval(function(){ 
+
+				  displayAds(data, intervalCount);
+				  
+				  intervalCount++;
+				  if (intervalCount >= data.length) {
+					intervalCount = 0;
+				  }
+				  
+				}, time);
+			  }
+			});
+		</script>
+		<div class="affilicate-ads"></div>
+		
+		<p>Hưỡng dẫn sử dụng</p>
+		
 	</body>
 </html>
